@@ -15,21 +15,20 @@ RUN apk update && apk add --no-cache \
     python3-dev
 
 # --- STEP 2: Create a virtual environment ---
-ENV VENV_PATH=/home/node/venv
+# Note: We do not need the ENV VENV_PATH variable for this corrected version
 # Create the venv directory and change its ownership to the 'node' user
-RUN mkdir -p $VENV_PATH && chown node:node $VENV_PATH
+RUN mkdir -p /home/node/venv && chown node:node /home/node/venv
 
-# Switch to the node user to create and use the venv
+# Switch back to the node user
 USER node
-RUN python3 -m venv $VENV_PATH
 
-# --- STEP 3: Activate the venv for subsequent commands and install packages ---
-# DO NOT MODIFY THE GLOBAL PATH. INSTEAD, WE WILL USE N8N_PYTHON_EXECUTABLE.
-# This ensures 'pip' and 'python' commands use the venv *during the build*.
-ENV PATH="$VENV_PATH/bin:$PATH"
+# --- STEP 3: Create venv and install packages into it ---
+RUN python3 -m venv /home/node/venv
 
-# Install required Python packages into the venv
-RUN pip install --no-cache-dir pandas numpy openpyxl selenium
+# FIXED: Call pip directly from the venv's full path.
+# This installs the packages correctly without changing the global PATH.
+RUN /home/node/venv/bin/pip install --no-cache-dir pandas numpy openpyxl selenium
+
 
 # --- STEP 4: Copy your Python scripts ---
 # This can be done after the environment is fully set up
