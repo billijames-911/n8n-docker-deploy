@@ -19,7 +19,7 @@ USER node
 RUN python3 -m venv /home/node/venv
 
 # --- STEP 4: Copy a simple Python script for testing ---
-COPY scripts/test_simple.py /home/node/test_simple.py
+COPY scripts/test_simple.py /home/node/py-n8n.py
 
 # The Dockerfile is now finished.
 # It will inherit the default CMD from the base image to start n8n.
