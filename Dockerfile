@@ -4,14 +4,9 @@ FROM n8nio/n8n:latest
 # Switch to root user to install packages
 USER root
 
-# --- STEP 1: Install system dependencies AND build tools ---
-RUN apk update && apk add --no-cache \
-    python3 \
-    py3-pip \
-    chromium \
-    chromium-chromedriver \
-    build-base \
-    python3-dev
+# --- STEP 1: Install system dependencies ---
+# We only need the base python3 and pip for this test
+RUN apk update && apk add --no-cache python3 py3-pip
 
 # --- STEP 2: Create a virtual environment ---
 RUN mkdir -p /home/node/venv && chown node:node /home/node/venv
@@ -19,12 +14,12 @@ RUN mkdir -p /home/node/venv && chown node:node /home/node/venv
 # Switch back to the node user
 USER node
 
-# --- STEP 3: Create venv and install packages into it ---
+# --- STEP 3: Create the venv ---
+# No additional packages will be installed for this test
 RUN python3 -m venv /home/node/venv
 
-# FIXED: Call pip directly from the venv's full path to avoid instability.
-RUN /home/node/venv/bin/pip install --no-cache-dir pandas numpy openpyxl selenium
+# --- STEP 4: Copy a simple Python script for testing ---
+COPY scripts/test_simple.py /home/node/test_simple.py
 
-# --- STEP 4: Copy your Python scripts ---
-COPY scripts/py-n8n.py /home/node/py-n8n.py
-COPY scripts/facebook.py /home/node/facebook.py
+# The Dockerfile is now finished.
+# It will inherit the default CMD from the base image to start n8n.
