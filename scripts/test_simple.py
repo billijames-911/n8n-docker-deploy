@@ -1,1 +1,0 @@
-print("Hello from Python! The test is successful.")
